@@ -1,28 +1,19 @@
 extern crate clap;
 extern crate rand;
 
-use clap::{Arg, App, SubCommand};
-use rand::distributions::{IndependentSample, Range};
+use clap::{Arg, App};
 
-// fn main() {
-//     let between = Range::new(10, 10000);
-//     let mut rng = rand::thread_rng();
-//     let mut sum = 0;
-//     for _ in 0..1000 {
-//         sum += between.ind_sample(&mut rng);
-//     }
-//     println!("{}", sum);
-// }
+mod die;
 
-fn is_digit(v: String) -> Result<(), String> {
-    match v.parse::<i32>() {
+fn test_is_positive_integer(v: String) -> Result<(), String> {
+    match v.parse::<u32>() {
         Ok(_) => Ok(()),
-        Err(_) => Err(String::from("Could not parse argument as integer!"))
+        Err(_) => Err(String::from(format!("{} is not an integer!", v)))
     }
 }
 
-fn as_int(v: &str) -> Result<i32, std::num::ParseIntError> {
-    v.parse::<i32>()
+fn as_uint(v: &str) -> u32 {
+    v.parse::<u32>().unwrap()
 }
 
 fn main() {
@@ -34,19 +25,28 @@ fn main() {
              .short("s")
              .long("sides")
              .help("Chooses the number of sides on each die")
-             .validator(is_digit)
+             .validator(test_is_positive_integer)
              .default_value("6"))
         .arg(Arg::with_name("dice")
              .short("d")
              .long("dice")
              .help("Choose the number of dice to roll")
-             .validator(is_digit)
+             .validator(test_is_positive_integer)
              .default_value("1"))
         .get_matches();
 
-    let dice = matches.value_of("dice").map(as_int).ok();
-    let sides = matches.value_of("sides").map(as_int).ok();
+    // Safe to `.unwrap()` here because arguments have been validated
+    let dice = matches.value_of("dice").map(as_uint).unwrap();
+    let sides = matches.value_of("sides").map(as_uint).unwrap();
 
-    println!("Rolling {} dice with {} sides",
-             dice, sides);
+    let mut die = die::Die::new(sides);
+    println!("{} {}", dice, die);
+
+
+    // Print spaces after all but the final roll
+    print!("    ");
+    for _ in 0..(dice - 1) {
+        print!("{}   ", die.roll());
+    }
+    println!("{}", die.roll());
 }

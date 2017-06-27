@@ -1,9 +1,13 @@
+#![crate_name = "dice"]
+// Specify the type of output artifact.
+#![crate_type = "bin"]
+
 extern crate clap;
 extern crate rand;
 
 use clap::{Arg, App};
-
 mod die;
+use self::die::Die;
 
 fn test_is_positive_integer(v: String) -> Result<(), String> {
     match v.parse::<u32>() {
@@ -39,7 +43,7 @@ fn main() {
     let dice = matches.value_of("dice").map(as_uint).unwrap();
     let sides = matches.value_of("sides").map(as_uint).unwrap();
 
-    let mut die = die::Die::new(sides);
+    let mut die = Die::new(sides);
     println!("{} {}", dice, die);
 
 

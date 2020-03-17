@@ -17,6 +17,9 @@ struct Opt {
     /// Dice specification -- e.g. "1d6" or "2d10". Add as many as you like.
     #[structopt(name = "SPECS", required_unless("repl"), multiple = true)]
     specification: Vec<String>,
+
+    // TODO: handle a `profile` name / path for loading a profile map, to
+    // refer comparisons against
 }
 
 fn main() {

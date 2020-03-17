@@ -83,6 +83,7 @@ fn parse_spec(i: &str) -> IResult<&str, DiceSpec> {
     ))
 }
 
+// TODO: handle a `load` command for loading a profile map
 pub fn parse_command<'a>(cmd: &'a str) -> Result<DiceSpec<'a>, ParseError> {
     let result = parse_spec(cmd.trim());
     match result {

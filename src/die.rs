@@ -20,6 +20,9 @@ pub struct DiceSpec<'lifetime> {
 }
 
 impl DiceSpec<'_> {
+
+    // TODO: compare `self.compare_to` against fields in a profile
+    // map, somehow
     pub fn roll(&self) -> Vec<u8> {
         self.dice.iter().map(|d| d.roll()).collect::<Vec<u8>>()
     }

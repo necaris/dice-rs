@@ -1,56 +1,31 @@
-#![crate_name = "dice"]
-// Specify the type of output artifact.
-#![crate_type = "bin"]
+extern crate structopt;
+use structopt::StructOpt;
 
-extern crate clap;
-extern crate rand;
+extern crate dice;
 
-use clap::{Arg, App};
-mod die;
-use self::die::Die;
+#[derive(Debug, StructOpt)]
+#[structopt(name = "dice", about = "An example of StructOpt usage.")]
+struct Opt {
+    /// Activate debug mode
+    #[structopt(short, long)]
+    debug: bool,
 
-fn test_is_positive_integer(v: String) -> Result<(), String> {
-    match v.parse::<u32>() {
-        Ok(_) => Ok(()),
-        Err(_) => Err(String::from(format!("{} is not an integer!", v)))
-    }
-}
+    /// Enter REPL mode
+    #[structopt(short, long)]
+    repl: bool,
 
-fn as_uint(v: &str) -> u32 {
-    v.parse::<u32>().unwrap()
+    /// Dice specification -- e.g. "1d6" or "2d10". Add as many as you like.
+    #[structopt(name = "SPECS", required_unless("repl"), multiple = true)]
+    specification: Vec<String>,
 }
 
 fn main() {
-    let matches = App::new("Generic Dice Roller")
-        .version("0.1")
-        .author("Rami Chowdhury <rami.chowdhury@gmail.com>")
-        .about("Rolls some fake dice")
-        .arg(Arg::with_name("sides")
-             .short("s")
-             .long("sides")
-             .help("Chooses the number of sides on each die")
-             .validator(test_is_positive_integer)
-             .default_value("6"))
-        .arg(Arg::with_name("dice")
-             .short("d")
-             .long("dice")
-             .help("Choose the number of dice to roll")
-             .validator(test_is_positive_integer)
-             .default_value("1"))
-        .get_matches();
-
-    // Safe to `.unwrap()` here because arguments have been validated
-    let dice = matches.value_of("dice").map(as_uint).unwrap();
-    let sides = matches.value_of("sides").map(as_uint).unwrap();
-
-    let mut die = Die::new(sides);
-    println!("{} {}", dice, die);
-
-
-    // Print spaces after all but the final roll
-    print!("    ");
-    for _ in 0..(dice - 1) {
-        print!("{}   ", die.roll());
+    let opts = Opt::from_args();
+    if opts.repl {
+        eprintln!("REPL mode isn't implemented yet!");
     }
-    println!("{}", die.roll());
+    match dice::parse_command(&opts.specification.join(" ")) {
+        Err(e) => eprintln!("{:?}", e),
+        Ok(spec) => println!("{:?}", spec.roll()),
+    }
 }

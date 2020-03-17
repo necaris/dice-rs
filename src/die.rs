@@ -1,36 +1,26 @@
-/// Provides the basic `Die` type which is "rolled"
-use std::fmt;
-use rand::distributions::{IndependentSample, Range};
-use rand::{thread_rng, ThreadRng};
+use rand::Rng;
+use rand::prelude::thread_rng;
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Die {
-    sides: u32,
-    rng: ThreadRng,
-    range: Range<u32>,
+    pub sides: u8,
 }
 
 impl Die {
-    pub fn new(sides: u32) -> Die {
-        Die {
-            sides: sides,
-            rng: thread_rng(),
-            // Since Range provides an interval half open on the right
-            // (i.e. does not include its endpoint) we need to do this
-            range: Range::new(1, sides + 1)
-        }
-    }
-
-    pub fn roll(&mut self) -> u32 {
-        self.range.ind_sample(&mut self.rng)
+    pub fn roll(&self) -> u8 {
+        let mut rng = thread_rng();
+        rng.gen_range(1, self.sides + 1)
     }
 }
 
-impl fmt::Display for Die {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // Write strictly the first element into the supplied output
-        // stream: `f`. Returns `fmt::Result` which indicates whether the
-        // operation succeeded or failed. Note that `write!` uses syntax which
-        // is very similar to `println!`.
-        write!(f, "d{}", self.sides)
+#[derive(Debug, PartialEq)]
+pub struct DiceSpec<'lifetime> {
+    pub dice: Vec<Die>,
+    pub compare_to: Option<&'lifetime str>,
+}
+
+impl DiceSpec<'_> {
+    pub fn roll(&self) -> Vec<u8> {
+        self.dice.iter().map(|d| d.roll()).collect::<Vec<u8>>()
     }
 }

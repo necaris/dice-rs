@@ -23,9 +23,18 @@ fn main() {
     let opts = Opt::from_args();
     if opts.repl {
         eprintln!("REPL mode isn't implemented yet!");
+        return;
     }
-    match dice::parse_command(&opts.specification.join(" ")) {
-        Err(e) => eprintln!("{:?}", e),
-        Ok(spec) => println!("{:?}", spec.roll()),
+    let spec_string = opts.specification.join(" ");
+    match dice::parse_command(&spec_string) {
+        Err(e) => eprintln!("{:?} (Evaluated: '{}')", e, spec_string),
+        Ok(spec) => {
+            let rolls = spec.roll();
+            for (die, roll) in spec.dice.iter().zip(rolls.iter()) {
+                println!("{} (d{})", roll, die.sides);
+            }
+            let sum: u32 = rolls.iter().map(|r| *r as u32).sum();
+            println!(" -- sum: {}", sum);
+        }
     }
 }

@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["Rami Chowdhury <rami.chowdhury@gmail.com>"]
 
 [dependencies]
-clap = "2.25.0"
-rand = "0.3.15"
+structopt = "0.3.11"
+rand = "0.7.3"
+nom = "5.1.1"
